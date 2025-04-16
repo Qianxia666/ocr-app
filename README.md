@@ -1,8 +1,8 @@
 ## 二开优化
 
-1.前端页面优化，响应式布局，可在前台查看日志
-
-2.新增INVITE_CODE变量代替PASSWORD变量，可以在前端输入后进入网站
+- 前端页面优化，响应式布局，可在前台查看日志。
+- 用户意外退出后，系统自动停止该用户的任务。
+- 新增INVITE_CODE变量代替PASSWORD变量，可以在前端输入后进入网站。
 
 ## 环境变量
 
@@ -19,7 +19,8 @@
 | `BACK_URL`         | 服务后端代码，设置成https的不过cloudflare的反代域名，能解决cloudflare 100秒请求超时的限制,不设置就获取你网页当前窗口的域名或ip| |
 
 ## docker-compose.yaml
-`version: '3.8'
+```
+version: '3.8'
 
 services:
   ocr-app:
@@ -30,4 +31,5 @@ services:
     ports:
       - "54188:54188"
     restart: always
-    network_mode: bridge`
+    network_mode: bridge
+```
