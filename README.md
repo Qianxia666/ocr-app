@@ -1,4 +1,5 @@
 ## 二开优化
+
 1.前端页面优化，响应式布局，可在前台查看日志
 2.新增INVITE_CODE变量代替PASSWORD变量，可以在前端输入后进入网站
 
@@ -12,6 +13,6 @@
 | `CONCURRENCY`      | 并发限制 (最大并发数)          | `5`                           |
 | `MAX_RETRIES`      | 最大重试次数                   | `5`                           |
 | `FAVICON_URL`      | 网站的图标 URL                 | `/static/favicon.ico`         |
-| `TITLE`            | 网站标题                       | `呱呱的oai图转文`              |
+| `TITLE`            | 网站标题                       | `OCR图像转文本`              |
 | `INVITE_CODE`      | 网站访问邀请码                 | `无`                          |
 | `BACK_URL`         | 服务后端代码，设置成https的不过cloudflare的反代域名，能解决cloudflare 100秒请求超时的限制,不设置就获取你网页当前窗口的域名或ip| |
