@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} - 邀请码验证</title>
+  <link rel="icon" href="{{ favicon_url }}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    
+    /* 移动端优化 */
+    @media (max-width: 640px) {
+      .mobile-card {
+        box-shadow: none;
+        background: transparent;
+      }
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+
+    // 检查系统主题偏好并设置初始主题
+    document.addEventListener('DOMContentLoaded', function() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    });
+  </script>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen text-slate-900 dark:text-slate-100 flex items-center justify-center p-4">
+  <div class="max-w-md w-full mx-auto p-4 sm:p-6 bg-white dark:bg-slate-800 rounded-xl shadow-lg sm:mobile-card">
+    <div class="text-center mb-6 sm:mb-8">
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{{ title }}</h1>
+      <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">请输入邀请码以访问OCR服务</p>
+    </div>
+
+    <form id="invite-form" class="space-y-4">
+      <div>
+        <label for="invite_code" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">邀请码</label>
+        <input type="text" id="invite_code" name="invite_code" class="w-full px-3 sm:px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm sm:text-base" placeholder="请输入邀请码" required>
+      </div>
+      
+      {% if error %}
+      <div class="py-2 px-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs sm:text-sm rounded-lg">
+        {{ error }}
+      </div>
+      {% endif %}
+      
+      <div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+          确认
+        </button>
+      </div>
+    </form>
+    
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+      <p class="text-xs text-center text-slate-500 dark:text-slate-400">
+        © 2024 {{ title }} - 基于OpenAI技术的OCR识别服务
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('invite-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      
+      try {
+        const response = await fetch('/verify_code', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // 跳转到主页
+          window.location.href = data.redirect;
+        } else {
+          // 显示错误消息
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'py-2 px-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs sm:text-sm rounded-lg';
+          errorDiv.textContent = data.message;
+          
+          // 移除之前的错误消息
+          const existingError = document.querySelector('.bg-red-100');
+          if (existingError) {
+            existingError.remove();
+          }
+          
+          // 插入新的错误消息
+          const submitButton = document.querySelector('button[type="submit"]').parentNode;
+          this.insertBefore(errorDiv, submitButton);
+        }
+      } catch (error) {
+        console.error('验证请求失败:', error);
+      }
+    });
+  </script>
+</body>
+</html> 

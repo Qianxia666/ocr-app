@@ -5,186 +5,360 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
   <link rel="icon" href="{{ favicon_url }}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #1D1F20;
+      font-family: 'Inter', system-ui, sans-serif;
     }
-    .container {
-      display: flex;
-      width: 80%;
-      max-width: 100%;
-      height: 80%;
-      gap: 20px;
-      color: grey;
+    
+    .active {
+      display: flex !important;
     }
-    .upload-box, .output-box {
-      flex: 1;
-      border: 2px dashed grey;
-      padding: 20px;
-      border-radius: 8px;
-      background-color: #181A1B;
-      position: relative;
+    
+    .upload-box-hover {
+      @apply border-indigo-500 bg-indigo-500/10;
     }
-    .upload-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      text-align: center;
-      overflow: hidden;
+    
+    .markdown-content {
+      @apply prose prose-slate dark:prose-invert max-w-none;
     }
-    .upload-box img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: cover; /* 保持比例并填满容器 */
-      margin-top: 10px;
+    
+    .markdown-content h1 {
+      @apply text-2xl font-bold mb-4;
+    }
+    
+    .markdown-content h2 {
+      @apply text-xl font-bold mb-3;
+    }
+    
+    .markdown-content p {
+      @apply mb-4;
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
     }
 
-    .output-box {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      border: 2px dashed grey;
-      padding: 20px;
-      border-radius: 8px;
-      background-color: #181A1B;
-      position: relative;
-      color: grey;
-    }
-
-    .output-box textarea {
-      flex: 2; /* 设置textarea占2份 */
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: #121212;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      color: white;
-    }
-
-    .output-box .markdown-preview {
-      flex: 3; /* 设置markdown-preview占3份 */
-      border: 1px solid #ccc;
-      padding: 10px;
-      background-color: #121212;
-      border-radius: 4px;
-      overflow-y: auto;
-      color: white;
-    }
-    .copy-btn {
-      display: block;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: #fff;
-      text-align: center;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .copy-btn:hover {
-      background-color: #0056b3;
-    }
-    .loading-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(105, 105, 105, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      font-weight: bold;
-      color: #333;
-      display: none;
-    }
-    .loading-overlay.active {
-      display: flex;
-    }
-
-    /* GitHub 图标样式 */
-    .github-link {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #333;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      text-decoration: none;
-    }
-
-    .github-icon {
-      width: 24px;
-      height: 24px;
-      fill: white;
+    /* 添加移动设备的优化样式 */
+    @media (max-width: 640px) {
+      .mobile-container {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      
+      .mobile-h1 {
+        font-size: 1.5rem;
+      }
+      
+      .mobile-p {
+        font-size: 0.875rem;
+      }
     }
   </style>
-  <!-- 引入 KaTeX 样式 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <!-- GitHub 图标链接 -->
-  <a href="https://github.com/gua12345/web_oai_img2text" target="_blank" class="github-link">
-    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v6/icons/github.svg" alt="GitHub" class="github-icon">
-  </a>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 min-h-screen text-slate-900 dark:text-slate-100">
+  <!-- 导航栏 -->
+  <nav class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700 fixed top-0 left-0 right-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <span class="text-xl font-semibold">{{ title }}</span>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button id="theme-toggle" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <svg id="dark-icon" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+            <svg id="light-icon" class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  <div class="container">
-    <!-- 上传图片/文件框 -->
-    <div class="upload-box" id="upload-box">
-      点击或拖拽文件到此上传<br>
-      支持图片和PDF文件
-      <img id="preview-img" style="display: none;">
-      <div class="loading-overlay" id="loading-overlay">正在处理...</div>
+  <main class="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center mb-8 sm:mb-10">
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mobile-h1">{{ title }}</h1>
+      <p class="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400 mobile-p">上传图片或PDF，快速提取文本内容</p>
     </div>
-    <!-- 输出框 -->
-    <div class="output-box">
-      <div class="markdown-preview" id="markdown-preview"></div>
-      <textarea id="raw-text" placeholder="原始文本 (Markdown 格式)"></textarea>
-      <button class="copy-btn" id="copy-btn">一键复制</button>
+
+    <!-- 使用 flex-col 替代 grid 以在移动设备上垂直堆叠内容 -->
+    <div class="flex flex-col lg:flex-row lg:gap-8 space-y-8 lg:space-y-0">
+      <!-- 上传区域 -->
+      <div class="flex flex-col lg:w-1/2">
+        <div id="upload-box" 
+             class="flex-grow min-h-[250px] sm:min-h-[350px] border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center justify-center cursor-pointer relative group">
+          <div class="text-slate-500 dark:text-slate-400 text-center space-y-3 px-4 sm:px-6 py-6 sm:py-8">
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-slate-400 dark:text-slate-500 group-hover:text-primary-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <p class="text-lg sm:text-xl font-medium">点击或拖拽上传文件</p>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">支持 JPG、PNG、JPEG 和 PDF 文件</p>
+          </div>
+          <img id="preview-img" class="hidden max-w-full max-h-[200px] sm:max-h-[300px] object-contain mt-4 sm:mt-6 rounded-lg shadow-md">
+          <div id="loading-overlay" 
+               class="absolute inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center text-white font-medium text-lg hidden rounded-xl">
+            <div class="flex flex-col items-center gap-4">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 relative">
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-primary-500/30 rounded-full"></div>
+                <div class="absolute top-0 left-0 w-full h-full border-4 border-transparent border-t-primary-500 rounded-full animate-spin"></div>
+              </div>
+              <div class="flex flex-col items-center">
+                <p>正在处理中...</p>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">请稍候片刻</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <div class="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">使用提示</h3>
+            <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
+              <li class="flex items-start">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500 mr-1.5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                上传清晰图片获得更准确的识别结果
+              </li>
+              <li class="flex items-start">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500 mr-1.5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                支持识别多种语言文本和数学公式
+              </li>
+              <li class="flex items-start">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500 mr-1.5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                PDF文件会自动处理所有页面
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 输出区域 -->
+      <div class="flex flex-col space-y-4 lg:w-1/2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex-grow">
+          <div class="border-b border-slate-200 dark:border-slate-700 px-3 sm:px-4 py-2.5 sm:py-3 flex justify-between items-center">
+            <h3 class="font-medium text-sm sm:text-base text-slate-900 dark:text-white">识别结果</h3>
+            <div class="flex gap-2">
+              <button id="copy-btn" class="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-1.5 border border-slate-300 dark:border-slate-600 shadow-sm text-xs font-medium rounded text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+                复制
+              </button>
+            </div>
+          </div>
+          <div class="p-3 sm:p-4">
+            <div id="markdown-preview" class="w-full bg-white dark:bg-slate-800 rounded-lg h-64 sm:h-96 overflow-y-auto text-slate-800 dark:text-slate-200 markdown-content"></div>
+          </div>
+        </div>
+        
+        <!-- 日志显示区域 -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+          <div class="border-b border-slate-200 dark:border-slate-700 px-3 sm:px-4 py-2.5 sm:py-3">
+            <h3 class="font-medium text-sm sm:text-base text-slate-900 dark:text-white">处理日志</h3>
+          </div>
+          <div class="p-3 sm:p-4">
+            <pre id="log-display" 
+                 class="w-full h-24 sm:h-32 p-2 sm:p-3 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 rounded-lg border border-slate-300 dark:border-slate-600 overflow-y-auto text-xs font-mono"></pre>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-4 sm:py-6 mt-6 sm:mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+        © 2024 {{ title }} - 基于OpenAI技术的OCR识别服务 | 
+        <a href="https://github.com/gua12345/web_oai_ocr" target="_blank" class="text-primary-500 hover:text-primary-600">原始代码</a> | 
+        <a href="https://github.com/Qianxia666/web_oai_ocr" target="_blank" class="text-primary-500 hover:text-primary-600">二次开发</a>
+      </p>
+    </div>
+  </footer>
 
   <script>
+    // 检查系统主题偏好并设置初始主题
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 主题切换
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    });
+
     const uploadBox = document.getElementById("upload-box");
-    const rawText = document.getElementById("raw-text");
     const markdownPreview = document.getElementById("markdown-preview");
     const copyBtn = document.getElementById("copy-btn");
     const previewImg = document.getElementById("preview-img");
     const loadingOverlay = document.getElementById("loading-overlay");
+    const logDisplay = document.getElementById("log-display");
+    
+    // 存储OCR识别内容
+    let recognizedContent = '';
+    
+    // 生成或获取唯一用户ID
+    function generateOrGetUserId() {
+      // 尝试从cookie中获取用户ID
+      const cookies = document.cookie.split(';');
+      let userId = null;
+      
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith('ocr_user_data=')) {
+          try {
+            const userData = JSON.parse(decodeURIComponent(cookie.substring('ocr_user_data='.length)));
+            if (userData.userId) {
+              userId = userData.userId;
+              break;
+            }
+          } catch (e) {
+            console.error('解析cookie失败:', e);
+          }
+        }
+      }
+      
+      // 如果没有找到用户ID，则生成一个新的
+      if (!userId) {
+        userId = 'user_' + Math.random().toString(36).substr(2, 8) + '_' + Date.now().toString(36);
+        
+        // 将新用户ID保存到cookie
+        const userData = { userId: userId };
+        document.cookie = `ocr_user_data=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400`; // 1天过期
+      }
+      
+      return userId;
+    }
+    
+    // 获取用户ID
+    const userId = generateOrGetUserId();
+    
+    // WebSocket连接
+    let ws;
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/ws/logs/${userId}`;
+      
+      ws = new WebSocket(wsUrl);
+      
+      ws.onopen = () => {
+        addLog("WebSocket 连接已建立");
+      };
+      
+      ws.onmessage = (event) => {
+        addLog(event.data);
+      };
+      
+      ws.onclose = () => {
+        addLog("WebSocket 连接已关闭，5秒后尝试重新连接...");
+        setTimeout(connectWebSocket, 5000);
+      };
+      
+      ws.onerror = (error) => {
+        console.error("WebSocket 错误:", error);
+        addLog("WebSocket 连接错误，稍后将重新尝试连接");
+      };
+    }
+    
+    // 初始化WebSocket连接
+    connectWebSocket();
+    
+    // 在用户离开页面时尝试关闭WebSocket连接
+    window.addEventListener('beforeunload', function() {
+      // 如果WebSocket连接存在且开启状态，尝试发送离开消息并关闭连接
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        try {
+          // 发送用户离开的消息
+          ws.send("user_leaving");
+          addLog("用户离开页面，发送离开通知");
+        } catch (e) {
+          console.error("发送离开消息失败:", e);
+        }
+        // 关闭WebSocket连接
+        ws.close();
+      }
+    });
+    
+    function addLog(message) {
+      const logDisplay = document.getElementById("log-display");
+      const timestamp = new Date().toLocaleTimeString();
+      logDisplay.innerHTML += `[${timestamp}] ${message}\n`;
+      logDisplay.scrollTop = logDisplay.scrollHeight;
+    }
 
+    // 设置基础URL（用于API请求）
+    const baseUrl = "{{ back_url }}" || window.location.origin + window.location.pathname;
+    
     // 上传文件事件
     uploadBox.addEventListener("dragover", (e) => {
       e.preventDefault();
-      uploadBox.style.borderColor = "#007bff";
+      uploadBox.classList.add("upload-box-hover");
     });
 
     uploadBox.addEventListener("dragleave", () => {
-      uploadBox.style.borderColor = "#ccc";
+      uploadBox.classList.remove("upload-box-hover");
     });
 
     uploadBox.addEventListener("drop", (e) => {
       e.preventDefault();
-      uploadBox.style.borderColor = "#ccc";
+      uploadBox.classList.remove("upload-box-hover");
       const file = e.dataTransfer.files[0];
-      resetFields(); // 清空字段
+      resetFields();
       handleFile(file);
       showPreview(file);
     });
@@ -195,7 +369,7 @@
       input.accept = "image/*,.pdf";
       input.onchange = (e) => {
         const file = e.target.files[0];
-        resetFields(); // 清空字段
+        resetFields();
         handleFile(file);
         showPreview(file);
       };
@@ -219,15 +393,22 @@
       const formData = new FormData();
       formData.append("file", file);
 
-      const baseUrl = "{{ backurl }}" || window.location.origin;
       const url = file.type.includes("pdf")
           ? `${baseUrl}/process/pdf`
           : `${baseUrl}/process/image`;
 
-      // 显示正在处理提示
       loadingOverlay.classList.add("active");
 
-      fetch(url, { method: "POST", body: formData })
+      // 在请求头中添加用户ID
+      const headers = {
+        "X-User-Id": userId
+      };
+
+      fetch(url, { 
+        method: "POST", 
+        body: formData,
+        headers: headers
+      })
         .then((response) => {
           if (!response.ok) {
             throw new Error("处理失败！");
@@ -235,38 +416,31 @@
           return response.json();
         })
         .then((data) => {
-          loadingOverlay.classList.remove("active"); // 移除正在处理提示
+          loadingOverlay.classList.remove("active");
           if (data.status === "success") {
-            rawText.value = data.content;
+            recognizedContent = data.text;
             updateMarkdownPreview();
           } else {
-            alert("处理失败，请重试！");
+            showToast("处理失败，请重试！", "error");
           }
         })
         .catch((err) => {
-          loadingOverlay.classList.remove("active"); // 移除正在处理提示
+          loadingOverlay.classList.remove("active");
           console.error("上传失败:", err);
-          alert("文件处理失败，请检查后端服务是否正常运行！");
+          showToast("文件处理失败，请检查后端服务是否正常运行！", "error");
         });
     }
 
     function resetFields() {
-      rawText.value = "";
+      recognizedContent = "";
       markdownPreview.innerHTML = "";
       previewImg.style.display = "none";
     }
 
-    // 实时更新 Markdown 预览
-    rawText.addEventListener("input", updateMarkdownPreview);
-
     function updateMarkdownPreview() {
-      const markdown = rawText.value;
+      const markdown = recognizedContent;
       const html = marked.parse(markdown);
-
-      // 渲染 Markdown 内容
       markdownPreview.innerHTML = html;
-
-      // 使用 KaTeX 渲染公式
       renderMathInElement(markdownPreview, {
         delimiters: [
           { left: "$$", right: "$$", display: true },
@@ -275,16 +449,33 @@
       });
     }
 
-    // 复制按钮功能
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white ${
+        type === "success" ? "bg-green-500" : "bg-red-500"
+      } shadow-lg transform transition-all duration-300 z-50`;
+      
+      let icon = '';
+      if (type === "success") {
+        icon = '<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+      } else {
+        icon = '<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>';
+      }
+      
+      toast.innerHTML = `<div class="flex items-center">${icon}<span>${message}</span></div>`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
     copyBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(rawText.value).then(() => {
-        alert("复制成功！");
+      navigator.clipboard.writeText(recognizedContent).then(() => {
+        showToast("复制成功！");
       });
     });
   </script>
-  <!-- 引入 marked.js 和 KaTeX -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js"></script>
 </body>
 </html>
